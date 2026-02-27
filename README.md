@@ -1,7 +1,7 @@
-## Assigment 2: AIRADA - An Autonomous Research & Intelligence Assistant
+## AIRADA - An Autonomous Research & Intelligence Assistant
 
 In today’s AI landscape, new frameworks, services, breakthroughs, and research are emerging at an overwhelming pace. Keeping up with these rapid developments is essential for anyone working in this field.
-AIRADA is a Proof of Concept (POC) AI system designed to bridge the gap by quickly capturing and summarizing the latest AI-related information available on the market.
+AIRADA is a Proof of Concept (POC) AI system designed to bridge the gap by quickly capturing and summarizing the latest AI-related information available on the market. It also provides precise **source links** to the content used to generate its summaries.
 
 ## Services
 
@@ -135,6 +135,8 @@ The agent will politely refuse to:
 
 - The RSS feeds occasionally fail to respond. More reliable or additional news sources should be integrated.
 
+- Tests are not required for this assignment. In future updates, comprehensive unit tests should be provided to cover at least all tools.
+
 - Guardrails are currently implemented using system prompts only. More advanced safety mechanisms should be considered in future development, such as:
 
 	- Rule-based content filtering layers
@@ -162,23 +164,24 @@ uv sync
 ```
 ### Ensure you have the required environment variables set up:
 
-- Create a `.secrets` file in the `05_src` directory with your `API_GATEWAY_KEY`
-- Format: `API_GATEWAY_KEY`=your-key-here (no spaces around the =)
+- Create a `.secrets` file in the `root` directory with your `OPENAI_API_KEY`
+- Format: `OPENAI_API_KEY`=your-key-here (no spaces around the =)
 
-### Build papers vector database (one time only):
+### Download & Build papers vector database (one time only):
 
-```cd 05_src/assignment_chat```
+1. ```cd arida```
 
-```uv run ingest_data.py```
+2. ```uv run src/data/01_download_data.py``` and wait until the download is successful. This will place `papers.csv` in your `data/raw` folder.
+![](images/progress.png)
 
-This will create the `data/chroma_db/` folder with the embedded papers.
+3.  ```uv run src/data/02_preprocess.py``` and wait until the proccessing is successful. This will place processed data into your `data/processed` folder.
+![](images/embbeding_progress.png)
+
+4. ```uv run src/data/03_ingest_data.py```. This will create the `data/vector/chroma_db/` folder with the embedded papers.
 
 ### Starting the Application
 
-```cd 05_src```
-
-```uv run assignment_chat/app.py```
-
+```uv run app.py```
 
 You should see:
 
@@ -194,7 +197,7 @@ Starting Gradio interface...
 ```
 Open your browser and navigate to http://127.0.0.1:7860 to interact with the chatbot.
 
-![](AIRADA.png)
+![](images/AIRADA.png)
 
 
 
