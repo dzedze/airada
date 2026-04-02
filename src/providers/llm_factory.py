@@ -1,6 +1,8 @@
 # llm_factory.py
 
 import os
+
+from pydantic import SecretStr
 from openai import OpenAI
 from chromadb.utils.embedding_functions import (
     OpenAIEmbeddingFunction,
@@ -15,6 +17,8 @@ load_dotenv(dotenv_path=env_path)
 
 # Access environment variables
 api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    raise ValueError("API key is not set")
 print("api_key:", api_key[:3])
 
 EMBEDDING_MODEL = "text-embedding-3-small"
@@ -40,9 +44,9 @@ def create_embedding_function(
     """
     ef = OpenAIEmbeddingFunction(
         model_name=EMBEDDING_MODEL,
-        api_key=api_key or api_key,
+        api_key=api_key,
     )
-    ef._client = create_openai_client(api_key=api_key)
+    ef.client = create_openai_client(api_key=api_key)
     return ef
 
 
@@ -55,5 +59,5 @@ def create_chat_agent(
     """
     return ChatOpenAI(
         model=model or CHAT_OPENAI_MODEL,
-        api_key=api_key or api_key,
+        api_key=SecretStr(api_key) if api_key else None,
     )

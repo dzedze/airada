@@ -17,7 +17,7 @@ save_path.parent.mkdir(parents=True, exist_ok=True)
 
 def download_data():
     # Download
-    response = requests.get(url, stream=True)
+    response = requests.get(url, stream=True, timeout=120)
     response.raise_for_status()
 
     total_size = int(response.headers.get("content-length", 0))

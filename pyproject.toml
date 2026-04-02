@@ -24,6 +24,9 @@ dependencies = [
 dev = [
     "black",
     "ruff",
+    "mypy",
+    "bandit",
+    "types-requests"
 ]
 
 [tool.ruff]
@@ -31,6 +34,15 @@ line-length = 68
 
 [tool.black]
 line-length = 68
+
+[tool.mypy]
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.bandit]
+exclude_dirs = [".venv", "__pycache__", "build", "dist"]
+skips = ["B101"]
 
 [tool.setuptools.packages.find]
 where = ["."]

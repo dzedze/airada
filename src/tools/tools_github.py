@@ -74,7 +74,7 @@ def search_github_repos(query: str) -> str:
     per_page = max(1, min(per_page, 20))
 
     # --- Build GitHub search query from topic tags ---
-    parts = []
+    parts: list[str] = []
     matched_topics = [
         t
         for t in AI_TOPICS
@@ -115,7 +115,7 @@ def search_github_repos(query: str) -> str:
     if language:
         parts.append(f"language:{language}")
 
-    params = {
+    params: dict[str, str | int] = {
         "q": " ".join(parts),
         "sort": "stars",
         "order": "desc",
