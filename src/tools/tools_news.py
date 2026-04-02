@@ -53,7 +53,9 @@ def _fetch_feed(feed_url: str, source_name: str) -> list:
     resp.raise_for_status()
 
     root = ET.fromstring(resp.content)
-    channel = root.find("channel") or root
+    channel = root.find("channel")
+    if channel is None:
+        channel = root
     items = channel.findall("item")[:MAX_ITEMS_PER_FEED]
 
     articles = []
