@@ -2,7 +2,6 @@
 Tests for src/prompts/prompts.py
 """
 
-import pytest
 from src.prompts.prompts import return_instructions
 
 
@@ -37,7 +36,9 @@ class TestPrompts:
     def test_return_instructions_contains_guardrails(self):
         """Test that instructions include GUARDRAILS section."""
         result = return_instructions()
-        assert "GUARDRAILS" in result or "guardrails" in result.lower()
+        assert (
+            "GUARDRAILS" in result or "guardrails" in result.lower()
+        )
 
     def test_return_instructions_is_deterministic(self):
         """Test that return_instructions always returns the same value."""
@@ -49,7 +50,11 @@ class TestPrompts:
         """Test that instructions mention available services."""
         result = return_instructions()
         # Should mention THREE services or tools
-        assert "THREE" in result or "services" in result.lower() or "tools" in result.lower()
+        assert (
+            "THREE" in result
+            or "services" in result.lower()
+            or "tools" in result.lower()
+        )
 
     def test_return_instructions_well_formatted(self):
         """Test that instructions are properly formatted."""

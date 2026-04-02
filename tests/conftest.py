@@ -6,7 +6,7 @@ import pytest
 import pandas as pd
 import tempfile
 from pathlib import Path
-from unittest.mock import Mock, MagicMock
+from unittest.mock import MagicMock
 import sys
 
 # Add src to path for imports
@@ -64,33 +64,35 @@ def sample_papers_csv(temp_dir):
 @pytest.fixture
 def sample_papers_dataframe():
     """Create a sample papers DataFrame for testing."""
-    return pd.DataFrame({
-        "title": [
-            "Multi-agent Reinforcement Learning Framework",
-            "Retrieval Augmented Generation for LLMs",
-            "BERT: Pre-training of Deep Bidirectional Transformers",
-        ],
-        "abstract": [
-            "This paper describes an autonomous agent system using tool use and planning mechanisms.",
-            "We present a rag-based approach to enhance language model performance with memory-augmented retrieval.",
-            "We introduce BERT, a large language model trained using masked language modeling.",
-        ],
-        "url_abs": [
-            "http://arxiv.org/abs/2301.001",
-            "http://arxiv.org/abs/2301.002",
-            "http://arxiv.org/pdf/1810.04805",
-        ],
-        "url_pdf": [
-            "http://arxiv.org/pdf/2301.001.pdf",
-            "http://arxiv.org/pdf/2301.002.pdf",
-            "http://arxiv.org/pdf/1810.04805.pdf",
-        ],
-        "arxiv_id": [
-            "2301.001",
-            "2301.002",
-            "1810.04805",
-        ],
-    })
+    return pd.DataFrame(
+        {
+            "title": [
+                "Multi-agent Reinforcement Learning Framework",
+                "Retrieval Augmented Generation for LLMs",
+                "BERT: Pre-training of Deep Bidirectional Transformers",
+            ],
+            "abstract": [
+                "This paper describes an autonomous agent system using tool use and planning mechanisms.",
+                "We present a rag-based approach to enhance language model performance with memory-augmented retrieval.",
+                "We introduce BERT, a large language model trained using masked language modeling.",
+            ],
+            "url_abs": [
+                "http://arxiv.org/abs/2301.001",
+                "http://arxiv.org/abs/2301.002",
+                "http://arxiv.org/pdf/1810.04805",
+            ],
+            "url_pdf": [
+                "http://arxiv.org/pdf/2301.001.pdf",
+                "http://arxiv.org/pdf/2301.002.pdf",
+                "http://arxiv.org/pdf/1810.04805.pdf",
+            ],
+            "arxiv_id": [
+                "2301.001",
+                "2301.002",
+                "1810.04805",
+            ],
+        }
+    )
 
 
 @pytest.fixture
@@ -115,10 +117,17 @@ def mock_chroma_collection():
     mock = MagicMock()
     mock.count.return_value = 0
     mock.upsert = MagicMock()
-    mock.query = MagicMock(return_value={
-        "ids": [["2301.001", "2301.002"]],
-        "metadatas": [[{"title": "Test Paper 1"}, {"title": "Test Paper 2"}]],
-        "documents": [["Test doc 1", "Test doc 2"]],
-        "distances": [[0.1, 0.2]],
-    })
+    mock.query = MagicMock(
+        return_value={
+            "ids": [["2301.001", "2301.002"]],
+            "metadatas": [
+                [
+                    {"title": "Test Paper 1"},
+                    {"title": "Test Paper 2"},
+                ]
+            ],
+            "documents": [["Test doc 1", "Test doc 2"]],
+            "distances": [[0.1, 0.2]],
+        }
+    )
     return mock

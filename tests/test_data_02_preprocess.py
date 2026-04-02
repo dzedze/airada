@@ -2,15 +2,18 @@
 Tests for src/data/02_preprocess.py
 """
 
-import pytest
-import pandas as pd
 from pathlib import Path
-from unittest.mock import patch, MagicMock, mock_open
-import tempfile
+import sys
 
 # Import the preprocess module directly
 from importlib import import_module
-preprocess = import_module('src.data.02_preprocess')
+
+# Ensure the src directory is in the path for importlib
+project_root = Path(__file__).parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
+
+preprocess = import_module("src.data.02_preprocess")
 
 
 class TestPreprocess:
@@ -18,10 +21,12 @@ class TestPreprocess:
 
     def test_process_data_function_exists(self):
         """Test that process_data function is defined."""
-        assert hasattr(preprocess, 'process_data')
+        assert hasattr(preprocess, "process_data")
         assert callable(preprocess.process_data)
 
-    def test_process_data_function_handles_data(self, sample_papers_dataframe):
+    def test_process_data_function_handles_data(
+        self, sample_papers_dataframe
+    ):
         """Test that process_data can be called and works with sample data."""
         # Instead of full integration test, verify the function exists
         # and can be invoked (in real scenarios it would be called in scripts)
@@ -32,7 +37,9 @@ class TestPreprocess:
         # Verify process_data exists and can be called
         assert callable(preprocess.process_data)
 
-    def test_process_data_drops_null_values(self, sample_papers_dataframe):
+    def test_process_data_drops_null_values(
+        self, sample_papers_dataframe
+    ):
         """Test that process_data would remove rows with null title/abstract."""
         # Verify the function exists and is callable (full testing via integration)
         assert callable(preprocess.process_data)
@@ -46,8 +53,17 @@ class TestPreprocess:
         """Test that regex pattern matches agent-related keywords."""
         import re
 
-        keywords_agent = ["agent", "agentic", "multi-agent", "autonomous agent"]
-        pattern = r"(?i)\b(?:" + "|".join(re.escape(k) for k in keywords_agent) + r")\b"
+        keywords_agent = [
+            "agent",
+            "agentic",
+            "multi-agent",
+            "autonomous agent",
+        ]
+        pattern = (
+            r"(?i)\b(?:"
+            + "|".join(re.escape(k) for k in keywords_agent)
+            + r")\b"
+        )
 
         test_strings = [
             ("Multi-agent system design", True),
@@ -58,14 +74,26 @@ class TestPreprocess:
 
         for text, should_match in test_strings:
             match = bool(re.search(pattern, text))
-            assert match == should_match, f"Pattern matching failed for: {text}"
+            assert (
+                match == should_match
+            ), f"Pattern matching failed for: {text}"
 
     def test_regex_pattern_matches_llm(self):
         """Test that regex pattern matches LLM-related keywords."""
         import re
 
-        keywords_llm = ["language model", "large language model", "llm", "transformer", "gpt"]
-        pattern = r"(?i)\b(?:" + "|".join(re.escape(k) for k in keywords_llm) + r")\b"
+        keywords_llm = [
+            "language model",
+            "large language model",
+            "llm",
+            "transformer",
+            "gpt",
+        ]
+        pattern = (
+            r"(?i)\b(?:"
+            + "|".join(re.escape(k) for k in keywords_llm)
+            + r")\b"
+        )
 
         test_strings = [
             ("Large Language Model Fine-Tuning", True),
@@ -76,7 +104,9 @@ class TestPreprocess:
 
         for text, should_match in test_strings:
             match = bool(re.search(pattern, text))
-            assert match == should_match, f"Pattern matching failed for: {text}"
+            assert (
+                match == should_match
+            ), f"Pattern matching failed for: {text}"
 
     def test_regex_pattern_case_insensitive(self):
         """Test that regex pattern is case-insensitive."""
@@ -86,4 +116,6 @@ class TestPreprocess:
 
         test_strings = ["Agent", "AGENT", "agent", "Agent Planning"]
         for text in test_strings:
-            assert re.search(pattern, text), f"Case-insensitive match failed for: {text}"
+            assert re.search(
+                pattern, text
+            ), f"Case-insensitive match failed for: {text}"

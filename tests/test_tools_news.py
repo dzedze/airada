@@ -3,12 +3,18 @@ Tests for src/tools/tools_news.py
 """
 
 import pytest
-from unittest.mock import patch, MagicMock
 import requests_mock
-from datetime import datetime
+import sys
+from pathlib import Path
 
 from importlib import import_module
-tools_news = import_module('src.tools.tools_news')
+
+# Ensure the src directory is in the path for importlib
+project_root = Path(__file__).parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
+
+tools_news = import_module("src.tools.tools_news")
 
 
 class TestNewsTools:
@@ -16,13 +22,13 @@ class TestNewsTools:
 
     def test_rss_feeds_defined(self):
         """Test that RSS_FEEDS dictionary is defined."""
-        assert hasattr(tools_news, 'RSS_FEEDS')
+        assert hasattr(tools_news, "RSS_FEEDS")
         assert isinstance(tools_news.RSS_FEEDS, dict)
         assert len(tools_news.RSS_FEEDS) > 0
 
     def test_max_items_per_feed_defined(self):
         """Test that MAX_ITEMS_PER_FEED constant is set."""
-        assert hasattr(tools_news, 'MAX_ITEMS_PER_FEED')
+        assert hasattr(tools_news, "MAX_ITEMS_PER_FEED")
         assert isinstance(tools_news.MAX_ITEMS_PER_FEED, int)
         assert tools_news.MAX_ITEMS_PER_FEED > 0
 
@@ -82,11 +88,15 @@ class TestNewsTools:
 
         with requests_mock.Mocker() as m:
             m.get("https://example.com/feed", text=rss_xml)
-            articles = tools_news._fetch_feed("https://example.com/feed", "Test Feed")
+            articles = tools_news._fetch_feed(
+                "https://example.com/feed", "Test Feed"
+            )
 
             assert len(articles) == 2
             assert articles[0]["title"] == "Test Article 1"
-            assert articles[0]["url"] == "https://example.com/article1"
+            assert (
+                articles[0]["url"] == "https://example.com/article1"
+            )
             assert articles[0]["source"] == "Test Feed"
             assert "2024-04-01" in articles[0]["published"]
 
@@ -125,7 +135,9 @@ class TestNewsTools:
 
         with requests_mock.Mocker() as m:
             m.get("https://example.com/feed", text=rss_xml)
-            articles = tools_news._fetch_feed("https://example.com/feed", "Test")
+            articles = tools_news._fetch_feed(
+                "https://example.com/feed", "Test"
+            )
 
             # Should be limited by MAX_ITEMS_PER_FEED
             assert len(articles) <= tools_news.MAX_ITEMS_PER_FEED
@@ -153,7 +165,9 @@ class TestNewsTools:
 
         with requests_mock.Mocker() as m:
             m.get("https://example.com/feed", text=rss_xml)
-            articles = tools_news._fetch_feed("https://example.com/feed", "Test")
+            articles = tools_news._fetch_feed(
+                "https://example.com/feed", "Test"
+            )
 
             # Only the complete item should be parsed
             assert len(articles) == 1
@@ -165,15 +179,22 @@ class TestNewsTools:
             m.get("https://example.com/feed", status_code=404)
 
             with pytest.raises(Exception):
-                tools_news._fetch_feed("https://example.com/feed", "Test")
+                tools_news._fetch_feed(
+                    "https://example.com/feed", "Test"
+                )
 
     def test_fetch_feed_invalid_xml(self):
         """Test handling of invalid XML in feed."""
         with requests_mock.Mocker() as m:
-            m.get("https://example.com/feed", text="Invalid XML content <not> closed")
+            m.get(
+                "https://example.com/feed",
+                text="Invalid XML content <not> closed",
+            )
 
             with pytest.raises(Exception):
-                tools_news._fetch_feed("https://example.com/feed", "Test")
+                tools_news._fetch_feed(
+                    "https://example.com/feed", "Test"
+                )
 
     def test_get_ai_news_fetches_all_feeds(self):
         """Test that get_ai_news fetches from all configured feeds."""
@@ -193,7 +214,9 @@ class TestNewsTools:
             for feed_url in tools_news.RSS_FEEDS.values():
                 m.get(feed_url, text=rss_xml)
 
-            result = tools_news.get_ai_news.invoke({"query": "What's new in AI?"})
+            result = tools_news.get_ai_news.invoke(
+                {"query": "What's new in AI?"}
+            )
 
             assert isinstance(result, str)
             assert "ARTICLE_COUNT" in result
@@ -220,7 +243,9 @@ class TestNewsTools:
             for feed_url in feed_urls[1:]:
                 m.get(feed_url, status_code=500)
 
-            result = tools_news.get_ai_news.invoke({"query": "AI news"})
+            result = tools_news.get_ai_news.invoke(
+                {"query": "AI news"}
+            )
 
             assert isinstance(result, str)
             assert "Working Article" in result
@@ -231,7 +256,9 @@ class TestNewsTools:
             for feed_url in tools_news.RSS_FEEDS.values():
                 m.get(feed_url, status_code=500)
 
-            result = tools_news.get_ai_news.invoke({"query": "AI news"})
+            result = tools_news.get_ai_news.invoke(
+                {"query": "AI news"}
+            )
 
             assert "FETCH_FAILED" in result
 
@@ -268,16 +295,22 @@ class TestNewsTools:
             for feed_url in feed_urls[2:]:
                 m.get(feed_url, status_code=500)
 
-            result = tools_news.get_ai_news.invoke({"query": "AI news"})
+            result = tools_news.get_ai_news.invoke(
+                {"query": "AI news"}
+            )
 
             # "New Article" (2024-04-02) should appear before "Old Article" (2024-04-01)
             # when sorted by date descending (newest first)
             new_pos = result.find("New Article")
             old_pos = result.find("Old Article")
             # Both should be found
-            assert new_pos >= 0 and old_pos >= 0, "Both articles should be in output"
+            assert (
+                new_pos >= 0 and old_pos >= 0
+            ), "Both articles should be in output"
             # Newest (04-02) should come first
-            assert new_pos < old_pos, "Newer article should appear before older article"
+            assert (
+                new_pos < old_pos
+            ), "Newer article should appear before older article"
 
     def test_get_ai_news_formats_output(self):
         """Test that output is properly formatted."""
@@ -297,7 +330,9 @@ class TestNewsTools:
             for feed_url in tools_news.RSS_FEEDS.values():
                 m.get(feed_url, text=rss_xml)
 
-            result = tools_news.get_ai_news.invoke({"query": "AI news"})
+            result = tools_news.get_ai_news.invoke(
+                {"query": "AI news"}
+            )
 
             # Check expected format
             assert "ARTICLE_COUNT:" in result
