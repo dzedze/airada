@@ -2,8 +2,8 @@ name: ci/cd for airada_poc
 
 on:
   push:
-  branches: ['main']
-  workflow_dispatch:
+    branches: ['main']
+    workflow_dispatch:
 
 jobs:
   lint-static-type-security-checks:
