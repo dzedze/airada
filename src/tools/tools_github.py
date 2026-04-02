@@ -1,6 +1,7 @@
 import re
 import requests
 from langchain.tools import tool
+
 # import os
 # from pathlib import Path
 # from dotenv import load_dotenv
@@ -13,9 +14,17 @@ GITHUB_SEARCH_URL = "https://api.github.com/search/repositories"
 
 # Supported topic tags
 AI_TOPICS = [
-    "ai-agents", "agentic-ai", "llm", "rag",
-    "llm-inference", "vector-database", "prompt-engineering",
-    "langchain", "openai", "huggingface", "machine-learning",
+    "ai-agents",
+    "agentic-ai",
+    "llm",
+    "rag",
+    "llm-inference",
+    "vector-database",
+    "prompt-engineering",
+    "langchain",
+    "openai",
+    "huggingface",
+    "machine-learning",
 ]
 
 
@@ -50,16 +59,27 @@ def search_github_repos(query: str) -> str:
     query_lower = query.lower()
 
     # --- Parse how many results the user wants, e.g. "top 5" ---
-    count_match = re.search(r"\btop\s*(\d+)\b|\b(\d+)\s*(repos?|projects?|results?)\b", query_lower)
+    count_match = re.search(
+        r"\btop\s*(\d+)\b|\b(\d+)\s*(repos?|projects?|results?)\b",
+        query_lower,
+    )
     if count_match:
-        per_page = int(next(g for g in count_match.groups() if g and g.isdigit()))
+        per_page = int(
+            next(
+                g for g in count_match.groups() if g and g.isdigit()
+            )
+        )
     else:
         per_page = 8
     per_page = max(1, min(per_page, 20))
 
     # --- Build GitHub search query from topic tags ---
     parts = []
-    matched_topics = [t for t in AI_TOPICS if t.replace("-", " ") in query_lower or t in query_lower]
+    matched_topics = [
+        t
+        for t in AI_TOPICS
+        if t.replace("-", " ") in query_lower or t in query_lower
+    ]
 
     if matched_topics:
         parts.extend(f"topic:{t}" for t in matched_topics[:3])
@@ -67,13 +87,28 @@ def search_github_repos(query: str) -> str:
         parts = ["topic:ai-agents", "topic:llm", "topic:agentic-ai"]
 
     # Extra plain keywords
-    for kw in ["autonomous", "agent", "multiagent", "framework", "inference", "rag"]:
-        if kw in query_lower and f"topic:{kw}" not in " ".join(parts):
+    for kw in [
+        "autonomous",
+        "agent",
+        "multiagent",
+        "framework",
+        "inference",
+        "rag",
+    ]:
+        if kw in query_lower and f"topic:{kw}" not in " ".join(
+            parts
+        ):
             parts.append(kw)
 
     # Language filter
     language = None
-    for lang in ["python", "typescript", "javascript", "rust", "go"]:
+    for lang in [
+        "python",
+        "typescript",
+        "javascript",
+        "rust",
+        "go",
+    ]:
         if lang in query_lower:
             language = lang
             break
@@ -88,14 +123,19 @@ def search_github_repos(query: str) -> str:
     }
 
     try:
-        response = requests.get(GITHUB_SEARCH_URL, headers=_get_headers(), params=params, timeout=10)
+        response = requests.get(
+            GITHUB_SEARCH_URL,
+            headers=_get_headers(),
+            params=params,
+            timeout=10,
+        )
 
         if response.status_code == 403:
             return "GitHub rate limit hit. Add a GITHUB_TOKEN to your .env for 5,000 req/hr."
         if not response.ok:
             return f"GitHub API error {response.status_code}: {response.text[:200]}"
 
-        data  = response.json()
+        data = response.json()
         items = data.get("items", [])
 
         if not items:
@@ -103,13 +143,13 @@ def search_github_repos(query: str) -> str:
 
         output = f"Found {data['total_count']:,} total repos. Showing top {len(items)}:\n\n"
         for i, repo in enumerate(items, 1):
-            name   = repo["full_name"]
-            url    = repo["html_url"]
-            desc   = repo.get("description") or "No description"
-            lang   = repo.get("language") or "N/A"
+            name = repo["full_name"]
+            url = repo["html_url"]
+            desc = repo.get("description") or "No description"
+            lang = repo.get("language") or "N/A"
             topics = ", ".join(repo.get("topics", [])) or "N/A"
-            stars  = f"{repo['stargazers_count']:,}"
-            forks  = f"{repo['forks_count']:,}"
+            stars = f"{repo['stargazers_count']:,}"
+            forks = f"{repo['forks_count']:,}"
 
             # Clickable markdown link
             output += f"{i}. [{name}]({url}) ⭐ {stars}\n"
@@ -127,6 +167,14 @@ def search_github_repos(query: str) -> str:
 
 # --- Testing ---
 if __name__ == "__main__":
-    print(search_github_repos.invoke({"query": "Show me the top 5 AI/LLM GitHub projects"}))
+    print(
+        search_github_repos.invoke(
+            {"query": "Show me the top 5 AI/LLM GitHub projects"}
+        )
+    )
     print("-" * 40)
-    print(search_github_repos.invoke({"query": "Give me repos with the topic agentic-ai"}))
+    print(
+        search_github_repos.invoke(
+            {"query": "Give me repos with the topic agentic-ai"}
+        )
+    )

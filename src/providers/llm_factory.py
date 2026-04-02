@@ -2,7 +2,9 @@
 
 import os
 from openai import OpenAI
-from chromadb.utils.embedding_functions import OpenAIEmbeddingFunction
+from chromadb.utils.embedding_functions import (
+    OpenAIEmbeddingFunction,
+)
 from langchain_openai import ChatOpenAI
 from pathlib import Path
 from dotenv import load_dotenv
@@ -11,7 +13,7 @@ from dotenv import load_dotenv
 env_path = Path(__file__).parent.parent.parent / ".secrets"
 load_dotenv(dotenv_path=env_path)
 
-# Access your environment variables
+# Access environment variables
 api_key = os.getenv("OPENAI_API_KEY")
 print("api_key:", api_key[:3])
 

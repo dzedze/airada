@@ -1,6 +1,3 @@
-print("AIRADA - Your AI Radar. Zero Hype. Maximum Signal....")
-print("Please wait while services initialise...")
-
 import uuid
 import gradio as gr
 from langchain_core.messages import HumanMessage
@@ -8,6 +5,10 @@ from langchain_core.messages import HumanMessage
 from src.main import get_graph
 
 import os
+
+print("AIRADA - Your AI Radar. Zero Hype. Maximum Signal....")
+print("Please wait while services initialise...")
+
 # stop langsmith tracing, not required for this assignment
 # prevent HTTPError messages at runtime
 os.environ["LANGCHAIN_TRACING_V2"] = "false"
@@ -25,11 +26,14 @@ print("Starting Gradio interface...\n")
 # conversation state — Gradio's `history` list is only used for rendering
 # the chat UI, not for feeding context into the model.
 
+
 def _make_thread_id() -> str:
     return f"aria-{uuid.uuid4().hex[:8]}"
 
 
-async def chat(message: str, history: list, thread_id: str) -> tuple[str, str]:
+async def chat(
+    message: str, history: list, thread_id: str
+) -> tuple[str, str]:
     """
     Gradio calls this on every user message.
 
@@ -74,7 +78,7 @@ Your AI Radar. Zero Hype. Maximum Signal.
 > ⚠️ I only answer from those three services. If it's outside my scope, I'll say so.
 """
 
-# examples list for gradio chat 
+# examples list for gradio chat
 _EXAMPLES = [
     ["Show me the top 5 AI/LLM GitHub projects"],
     ["Give me repos with the topic agentic-ai"],

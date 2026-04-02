@@ -5,7 +5,7 @@ from pathlib import Path
 
 # --- Configuration (must match ingest_data.py) ---
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-CHROMA_DB_PATH  = BASE_DIR / "data" / "vector" / "chroma_db"
+CHROMA_DB_PATH = BASE_DIR / "data" / "vector" / "chroma_db"
 COLLECTION_NAME = "arxiv_papers"
 # Number of top relevant vectors to retrieve
 TOP_K = 5
@@ -13,6 +13,7 @@ TOP_K = 5
 # --- Lazy ChromaDB connection ---
 
 _collection = None
+
 
 def _get_collection():
     """Connect to ChromaDB once and reuse the connection for all queries."""
@@ -25,10 +26,14 @@ def _get_collection():
                 name=COLLECTION_NAME,
                 embedding_function=ef,
             )
-            print(f"Connected to '{COLLECTION_NAME}' ({_collection.count():,} papers)")
+            print(
+                f"Connected to '{COLLECTION_NAME}' ({_collection.count():,} papers)"
+            )
         except Exception as e:
             print(f"Could not load ChromaDB collection: {e}")
-            print("Run `python ingest_data.py` first to build the vector index.")
+            print(
+                "Run `python ingest_data.py` first to build the vector index."
+            )
             _collection = None
     return _collection
 
@@ -74,14 +79,16 @@ def search_ai_papers(query: str) -> str:
         results["metadatas"][0],
         results["distances"][0],
     ):
-        papers.append({
-            "document": doc,
-            "title":    meta.get("title",    "Unknown"),
-            "arxiv_id": meta.get("arxiv_id", ""),
-            "url_abs":  meta.get("url_abs",  ""),
-            "url_pdf":  meta.get("url_pdf",  ""),
-            "score":    round(1 - dist, 4),
-        })
+        papers.append(
+            {
+                "document": doc,
+                "title": meta.get("title", "Unknown"),
+                "arxiv_id": meta.get("arxiv_id", ""),
+                "url_abs": meta.get("url_abs", ""),
+                "url_pdf": meta.get("url_pdf", ""),
+                "score": round(1 - dist, 4),
+            }
+        )
 
     # Return a raw labelled context block — no LLM here
     lines = [f"PAPER_COUNT: {len(papers)}", ""]
@@ -100,4 +107,8 @@ def search_ai_papers(query: str) -> str:
 
 # --- Testing ---
 if __name__ == "__main__":
-    print(search_ai_papers.invoke({"query": "Summarize top LLM research trends"}))
+    print(
+        search_ai_papers.invoke(
+            {"query": "Summarize top LLM research trends"}
+        )
+    )

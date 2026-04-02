@@ -27,7 +27,9 @@ agent_with_tools = chat_agent.bind_tools(tools)
 checkpointer = InMemorySaver()
 
 # ── Context window settings ───────────────────────────────────────────────────
-MAX_HISTORY_TOKENS = 4_000  # ~last 8-12 conversational turns depending on length
+MAX_HISTORY_TOKENS = (
+    4_000  # ~last 8-12 conversational turns depending on length
+)
 
 
 def _trim(messages: list) -> list:
@@ -37,12 +39,15 @@ def _trim(messages: list) -> list:
     """
     trimmed = trim_messages(
         messages,
-        strategy="last",                        # keep the tail (most recent)
+        strategy="last",  # keep the tail (most recent)
         token_counter=count_tokens_approximately,
         max_tokens=MAX_HISTORY_TOKENS,
-        start_on="human",                       # window must start with a user msg
-        end_on=("human", "tool"),               # window must end on user or tool msg
-        include_system=False,                   # we inject system prompt separately
+        start_on="human",  # window must start with a user msg
+        end_on=(
+            "human",
+            "tool",
+        ),  # window must end on user or tool msg
+        include_system=False,  # we inject system prompt separately
     )
 
     if len(trimmed) < len(messages):
@@ -56,6 +61,7 @@ def _trim(messages: list) -> list:
 
 
 # ── Graph nodes ───────────────────────────────────────────────────────────────
+
 
 async def call_model(state: MessagesState):
     """
@@ -81,6 +87,7 @@ async def call_model(state: MessagesState):
 
 
 # ── Graph definition ──────────────────────────────────────────────────────────
+
 
 def get_graph():
     """

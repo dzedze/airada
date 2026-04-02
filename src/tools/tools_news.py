@@ -7,9 +7,9 @@ from langchain.tools import tool
 
 # RSS feeds to pull from
 RSS_FEEDS = {
-    "VentureBeat AI":  "https://venturebeat.com/category/ai/feed/",
+    "VentureBeat AI": "https://venturebeat.com/category/ai/feed/",
     "MIT Tech Review": "https://www.technologyreview.com/feed/",
-    "The Decoder":     "https://the-decoder.com/feed/",
+    "The Decoder": "https://the-decoder.com/feed/",
 }
 
 MAX_ITEMS_PER_FEED = 6
@@ -30,7 +30,9 @@ def _parse_date(raw: str) -> str:
         "%Y-%m-%dT%H:%M:%S%z",
     ):
         try:
-            return datetime.strptime(raw.strip(), fmt).strftime("%Y-%m-%d")
+            return datetime.strptime(raw.strip(), fmt).strftime(
+                "%Y-%m-%d"
+            )
         except ValueError:
             continue
     return raw.strip()
@@ -50,27 +52,29 @@ def _fetch_feed(feed_url: str, source_name: str) -> list:
     )
     resp.raise_for_status()
 
-    root    = ET.fromstring(resp.content)
+    root = ET.fromstring(resp.content)
     channel = root.find("channel") or root
-    items   = channel.findall("item")[:MAX_ITEMS_PER_FEED]
+    items = channel.findall("item")[:MAX_ITEMS_PER_FEED]
 
     articles = []
     for item in items:
         title = (item.findtext("title") or "").strip()
-        link  = (item.findtext("link")  or "").strip()
-        pub   = (item.findtext("pubDate") or "").strip()
-        desc  = (item.findtext("description") or "").strip()
+        link = (item.findtext("link") or "").strip()
+        pub = (item.findtext("pubDate") or "").strip()
+        desc = (item.findtext("description") or "").strip()
 
         if not title or not link:
             continue
 
-        articles.append({
-            "title":     title,
-            "url":       link,
-            "summary":   _clean_html(desc)[:400],
-            "published": _parse_date(pub) if pub else "",
-            "source":    source_name,
-        })
+        articles.append(
+            {
+                "title": title,
+                "url": link,
+                "summary": _clean_html(desc)[:400],
+                "published": _parse_date(pub) if pub else "",
+                "source": source_name,
+            }
+        )
 
     return articles
 
@@ -97,7 +101,7 @@ def get_ai_news(query: str) -> str:
     print(f"[News] Fetching RSS feeds for: '{query}'")
 
     all_articles = []
-    errors       = []
+    errors = []
 
     for source_name, feed_url in RSS_FEEDS.items():
         try:
@@ -114,11 +118,15 @@ def get_ai_news(query: str) -> str:
             print(f"[News]   {msg}")
 
     if not all_articles:
-        error_detail = "; ".join(errors) if errors else "unknown error"
+        error_detail = (
+            "; ".join(errors) if errors else "unknown error"
+        )
         return f"FETCH_FAILED: Could not retrieve articles from any feed. Errors: {error_detail}"
 
     # Sort newest first
-    all_articles.sort(key=lambda a: a.get("published") or "", reverse=True)
+    all_articles.sort(
+        key=lambda a: a.get("published") or "", reverse=True
+    )
 
     # Build a plain structured digest
     lines = [f"ARTICLE_COUNT: {len(all_articles)}", ""]
@@ -139,4 +147,6 @@ def get_ai_news(query: str) -> str:
 
 # --- Testing ---
 if __name__ == "__main__":
-    print(get_ai_news.invoke({"query": "What's new in AI this week?"}))
+    print(
+        get_ai_news.invoke({"query": "What's new in AI this week?"})
+    )
