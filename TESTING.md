@@ -8,8 +8,8 @@ This project includes comprehensive unit and functional tests for the core modul
 - **Prompts** (`src/prompts/prompts.py`): System instruction management
 
 ## Test Statistics
-- **Total Tests**: 44
-- **Test Coverage**: Core pipeline and provider modules
+- **Total Tests**: 87
+- **Test Coverage**: Core pipeline, provider modules, prompts, tools
 - **Framework**: pytest with mocking support
 
 ## Running Tests
@@ -95,6 +95,27 @@ Tests for system prompts:
 - Content validation (personality, scope, guardrails)
 - Formatting and structure
 - Deterministic output
+
+### `test_tools_github.py` (12 tests)
+Tests for GitHub repo-search tool:
+- Query parsing for topic/language/count
+- API request headers and URL
+- Rate limit and HTTP error handling
+- Repository formatting and edge cases
+
+### `test_tools_news.py` (15 tests)
+Tests for RSS news tool:
+- RSS fetch from configured feeds
+- HTML cleanup and date normalization
+- Partial and failed feed handling
+- Article sorting and formatted output
+
+### `test_tools_papers.py` (10 tests)
+Tests for ChromaDB papers search tool:
+- Collection initialization + caching
+- Top-k results and metadata handling
+- Formatting and relevance scoring
+- Langchain tool invocation (`.invoke`) 
 
 ## Fixtures
 Common test fixtures in `conftest.py`:
