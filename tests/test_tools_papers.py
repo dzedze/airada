@@ -43,7 +43,7 @@ class TestPapersTools:
         assert "chroma_db" in str(tools_papers.CHROMA_DB_PATH)
 
     @patch("chromadb.PersistentClient")
-    @patch("src.providers.llm_factory.create_embedding_function")
+    @patch.object(tools_papers, "create_embedding_function")
     def test_get_collection_initializes_client(
         self, mock_embedding_fn, mock_client
     ):
@@ -67,7 +67,7 @@ class TestPapersTools:
         mock_client.assert_called_once()
 
     @patch("chromadb.PersistentClient")
-    @patch("src.providers.llm_factory.create_embedding_function")
+    @patch.object(tools_papers, "create_embedding_function")
     def test_get_collection_caches_result(
         self, mock_embedding_fn, mock_client
     ):
@@ -97,7 +97,7 @@ class TestPapersTools:
         assert result1 is result2
 
     @patch("chromadb.PersistentClient")
-    @patch("src.providers.llm_factory.create_embedding_function")
+    @patch.object(tools_papers, "create_embedding_function")
     def test_get_collection_handles_connection_error(
         self, mock_embedding_fn, mock_client
     ):
@@ -118,7 +118,7 @@ class TestPapersTools:
         assert result is None
 
     @patch("chromadb.PersistentClient")
-    @patch("src.providers.llm_factory.create_embedding_function")
+    @patch.object(tools_papers, "create_embedding_function")
     def test_search_ai_papers_with_available_db(
         self, mock_embedding_fn, mock_client
     ):
@@ -171,7 +171,7 @@ class TestPapersTools:
         assert "PAPER_COUNT:" in result or "arxiv_id" in result
 
     @patch("chromadb.PersistentClient")
-    @patch("src.providers.llm_factory.create_embedding_function")
+    @patch.object(tools_papers, "create_embedding_function")
     def test_search_ai_papers_without_db(
         self, mock_embedding_fn, mock_client
     ):
@@ -194,7 +194,7 @@ class TestPapersTools:
         assert "ingest_data" in result
 
     @patch("chromadb.PersistentClient")
-    @patch("src.providers.llm_factory.create_embedding_function")
+    @patch.object(tools_papers, "create_embedding_function")
     def test_search_ai_papers_respects_top_k(
         self, mock_embedding_fn, mock_client
     ):
@@ -236,7 +236,7 @@ class TestPapersTools:
         assert call_args[1]["n_results"] == tools_papers.TOP_K
 
     @patch("chromadb.PersistentClient")
-    @patch("src.providers.llm_factory.create_embedding_function")
+    @patch.object(tools_papers, "create_embedding_function")
     def test_search_ai_papers_formats_output(
         self, mock_embedding_fn, mock_client
     ):
@@ -281,7 +281,7 @@ class TestPapersTools:
         assert "PDF:" in result or "pdf" in result
 
     @patch("chromadb.PersistentClient")
-    @patch("src.providers.llm_factory.create_embedding_function")
+    @patch.object(tools_papers, "create_embedding_function")
     def test_search_ai_papers_handles_missing_metadata(
         self, mock_embedding_fn, mock_client
     ):
@@ -320,7 +320,7 @@ class TestPapersTools:
         assert len(result) > 0
 
     @patch("chromadb.PersistentClient")
-    @patch("src.providers.llm_factory.create_embedding_function")
+    @patch.object(tools_papers, "create_embedding_function")
     def test_search_ai_papers_includes_relevance_score(
         self, mock_embedding_fn, mock_client
     ):

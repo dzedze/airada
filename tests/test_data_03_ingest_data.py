@@ -139,7 +139,7 @@ class TestIngestData:
         assert metadata["arxiv_id"] == "2301.001"
 
     @patch("chromadb.PersistentClient")
-    @patch("src.providers.llm_factory.create_embedding_function")
+    @patch.object(ingest_data, "create_embedding_function")
     @patch("pandas.read_csv")
     def test_ingest_loads_csv(
         self, mock_read_csv, mock_embedding, mock_client
@@ -173,7 +173,7 @@ class TestIngestData:
         mock_read_csv.assert_called_once()
 
     @patch("chromadb.PersistentClient")
-    @patch("src.providers.llm_factory.create_embedding_function")
+    @patch.object(ingest_data, "create_embedding_function")
     @patch("pandas.read_csv")
     def test_ingest_validates_required_columns(
         self, mock_read_csv, mock_embedding, mock_client
@@ -201,7 +201,7 @@ class TestIngestData:
             ingest_data.ingest()
 
     @patch("chromadb.PersistentClient")
-    @patch("src.providers.llm_factory.create_embedding_function")
+    @patch.object(ingest_data, "create_embedding_function")
     @patch("pandas.read_csv")
     def test_ingest_drops_empty_rows(
         self, mock_read_csv, mock_embedding, mock_client
@@ -235,7 +235,7 @@ class TestIngestData:
         mock_collection.upsert.assert_called()
 
     @patch("chromadb.PersistentClient")
-    @patch("src.providers.llm_factory.create_embedding_function")
+    @patch.object(ingest_data, "create_embedding_function")
     @patch("pandas.read_csv")
     def test_ingest_creates_embeddings_in_batches(
         self, mock_read_csv, mock_embedding, mock_client
